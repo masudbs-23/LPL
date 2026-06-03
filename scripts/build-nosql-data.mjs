@@ -1,0 +1,76 @@
+import { writeFileSync } from "fs";
+
+const qa = (q, qEn, a) =>
+  `  { q: ${JSON.stringify(q)}, qEn: ${JSON.stringify(qEn)}, a: ${JSON.stringify(a)} },`;
+
+const items = [
+  ["১. NoSQL কী?", "1. What is NoSQL?", "NoSQL মানে Not Only SQL — টেবিল-JOIN ছাড়া flexible data storage।\n\nExample: Facebook post, chat message, logs — schema সহজে বদলায়।\n\n💡 মুখস্থ: Flexible + Scale"],
+  ["২. SQL vs NoSQL", "2. SQL vs NoSQL", "| | SQL | NoSQL (MongoDB) |\n| Data | Table rows | JSON documents |\n| Schema | Fixed first | Flexible |\n| Scale | Vertical | Horizontal |\n| Example | Bank | App feed, logs |"],
+  ["৩. NoSQL ৪ ধরন", "3. Four NoSQL types", "Document → MongoDB\nKey-Value → Redis\nColumn → Cassandra\nGraph → Neo4j\n\n💡 Interview: MongoDB = Document DB"],
+  ["৪. MongoDB কী?", "4. What is MongoDB?", "Document database — data JSON document আকারে collection এ।\n\n```json\n{ \"name\": \"Rahim\", \"age\": 22, \"city\": \"Dhaka\" }\n```"],
+  ["৫. Collection vs Table", "5. Collection vs table", "SQL → Table\nMongoDB → Collection (documents এর group)"],
+  ["৬. Document কী?", "6. What is a document?", "একটা BSON/JSON record — SQL row এর মতো কিন্তু nested field থাকতে পারে।"],
+  ["৭. _id field", "7. _id field", "প্রতিটা document এর unique identifier — auto generate হয়।\n\n💡 Primary key এর মতো"],
+  ["৮. insertOne / insertMany", "8. insertOne / insertMany", "```javascript\ndb.users.insertOne({ name: \"Rahim\", age: 22 });\ndb.users.insertMany([{...}, {...}]);\n```"],
+  ["৯. find() কী?", "9. What is find()?", "```javascript\ndb.users.find({ age: { $gt: 18 } });\n```\n\nমানে: ১৮ এর বেশি বয়স।"],
+  ["১০. updateOne / updateMany", "10. updateOne / updateMany", "```javascript\ndb.users.updateOne(\n  { name: \"Rahim\" },\n  { $set: { age: 23 } }\n);\n```"],
+  ["১১. deleteOne / deleteMany", "11. deleteOne / deleteMany", "```javascript\ndb.users.deleteOne({ name: \"Karim\" });\n```"],
+  ["১২. $set, $inc, $push", "12. $set, $inc, $push", "$set — field update\n$inc — number বাড়ানো\n$push — array তে যোগ\n\n```javascript\n{ $inc: { views: 1 }, $push: { tags: \"hot\" } }\n```"],
+  ["১৩. Query operators", "13. Query operators", "$gt, $gte, $lt, $lte, $in, $nin, $ne, $exists\n\nInterview এ $gt, $in খুব common।"],
+  ["১৪. Projection", "14. Projection", "শুধু দরকারি field আনা — SELECT columns এর মতো।\n\n```javascript\ndb.users.find({}, { name: 1, _id: 0 });\n```"],
+  ["১৫. sort(), limit(), skip()", "15. sort, limit, skip", "```javascript\ndb.users.find().sort({ age: -1 }).limit(10).skip(0);\n```\n\nPagination এর জন্য।"],
+  ["১৬. Index MongoDB এ", "16. Indexes in MongoDB", "Query fast করার জন্য — SQL index এর মতো।\n\n```javascript\ndb.users.createIndex({ email: 1 });\n```\n\n💡 Interview এ খুব common"],
+  ["১৭. Unique Index", "17. Unique index", "```javascript\ndb.users.createIndex({ email: 1 }, { unique: true });\n```\n\nDuplicate email block করে।"],
+  ["১৮. Compound Index", "18. Compound index", "```javascript\ndb.orders.createIndex({ userId: 1, createdAt: -1 });\n```"],
+  ["১৯. COLLSCAN vs IXSCAN", "19. COLLSCAN vs IXSCAN", "COLLSCAN — পুরো collection scan (slow)\nIXSCAN — index use (fast)\n\nexplain() দিয়ে দেখুন।"],
+  ["২০. Aggregation Pipeline", "20. Aggregation pipeline", "Complex report/analytics — stages chain।\n\n```javascript\ndb.orders.aggregate([\n  { $match: { status: \"paid\" } },\n  { $group: { _id: \"$userId\", total: { $sum: \"$amount\" } } }\n]);\n```"],
+  ["২১. $match, $group, $lookup", "21. $match, $group, $lookup", "$match — filter\n$group — group + aggregate\n$lookup — JOIN এর মতো"],
+  ["২২. Embed vs Reference", "22. Embed vs reference", "Embed — nested document (1 query)\nReference — ObjectId link (normalize)\n\n১ query লাগলে embed; shared entity হলে reference।"],
+  ["২৩. Mongoose কী?", "23. What is Mongoose?", "MongoDB এর ODM — schema, validation, middleware।\n\n```javascript\nconst userSchema = new Schema({ name: String, age: Number });\n```"],
+  ["২৪. Schema vs Model", "24. Schema vs model", "Schema — structure definition\nModel — collection এর class (User.find())"],
+  ["২৫. Validation Mongoose", "25. Mongoose validation", "required, min, max, enum, custom validator — save এর আগে check।"],
+  ["২৬. Middleware (pre/post)", "26. Mongoose middleware", "pre('save') — save এর আগে (hash password)\npost('save') — save এর পরে (log)"],
+  ["২৭. populate()", "27. populate()", "Reference field এ related document load — SQL JOIN এর মতো feeling।\n\n```javascript\nOrder.find().populate('userId');\n```"],
+  ["২৮. Replica Set", "28. Replica set", "Primary + Secondary copies — high availability, automatic failover।\n\nProduction এ ৩+ nodes (odd)।"],
+  ["২৯. Sharding", "29. Sharding", "ডেটা multiple server এ ভাগ — very large scale।\n\nShard key ঠিক করা critical।"],
+  ["৩০. CAP Theorem (NoSQL)", "30. CAP in NoSQL", "Consistency, Availability, Partition tolerance — distributed system এ ২টা পূর্ণ।\n\nMongoDB: CP leaning"],
+  ["৩১. Eventual Consistency", "31. Eventual consistency", "সব replica তৎক্ষণাৎ same নাও হতে পারে — কিছু সময় পরে match।"],
+  ["৩২. BSON কী?", "32. What is BSON?", "Binary JSON — MongoDB storage format, extra types (Date, ObjectId)।"],
+  ["৩৩. ObjectId", "33. ObjectId", "১২-byte unique ID — timestamp + machine + counter hint।"],
+  ["৩৪. TTL Index", "34. TTL index", "নির্দিষ্ট সময় পর document auto delete — session, logs।\n\n```javascript\ncreateIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 })\n```"],
+  ["৩৫. Text Index", "35. Text index", "Full-text search — $text query।"],
+  ["৩৬. Transaction MongoDB", "36. MongoDB transactions", "Multi-document ACID (replica set) — payment + inventory একসাথে।\n\n```javascript\nsession.startTransaction();\n```"],
+  ["৩৭. Change Streams", "37. Change streams", "Real-time data change listen — audit, sync।"],
+  ["৩৮. Redis vs MongoDB", "38. Redis vs MongoDB", "Redis — cache, session, queue (memory)\nMongoDB — primary database (disk + documents)"],
+  ["৩৯. When SQL vs MongoDB?", "39. When SQL vs MongoDB?", "SQL — strict relation, reporting, ACID banking\nMongoDB — flexible schema, rapid dev, nested data, scale-out"],
+  ["৪০. Schema Design best practice", "40. Schema design tips", "Access pattern অনুযায়ী design\nWorking set RAM এ fit\nIndex early\nAvoid unbounded arrays"],
+  ["৪১. Slow query debug MongoDB", "41. Debug slow MongoDB queries", "explain('executionStats')\nIndex missing?\nCOLLSCAN?\nProjection reduce fields"],
+  ["৪২. N+1 in MongoDB", "42. N+1 in MongoDB", "Loop এ populate/find — solution: $lookup aggregation বা batch find with $in"],
+  ["৪৩. Security MongoDB", "43. MongoDB security", "Auth, role-based access, network bind, no default open prod, validate input"],
+  ["৪৪. Injection MongoDB", "44. MongoDB injection", "User input সরাসরি query object এ না — sanitize, typed queries (Mongoose)"],
+  ["৪৫. Backup strategies", "45. Backup strategies", "mongodump, Atlas backup, replica + snapshot"],
+  ["৪৬. Atlas কী?", "46. What is MongoDB Atlas?", "Managed cloud MongoDB — auto backup, scaling।"],
+  ["৪৭. Horizontal vs Vertical scale", "47. Horizontal vs vertical scaling", "Vertical — bigger server\nHorizontal — more servers (MongoDB strength)"],
+  ["৪৮. Write Concern", "48. Write concern", "Write কত replica এ confirm হবে — durability vs speed trade-off।"],
+  ["৪৯. Read Preference", "49. Read preference", "primary, secondary, nearest — read scaling replica থেকে।"],
+  ["৫০. Pagination MongoDB", "50. Pagination in MongoDB", "limit + skip (small offset)\nCursor: lastId based (large data)\n\n```javascript\nfind({ _id: { $gt: lastId } }).limit(10)\n```"],
+  ["৫১. $unwind", "51. $unwind", "Array field কে আলাদা documents এ ভাঙে — report এ দরকার।"],
+  ["৫২. $project", "52. $project", "Shape output fields — computed fields যোগ করা যায়।"],
+  ["৫৩. $addToSet", "53. $addToSet", "Array তে unique value যোগ — duplicate না।"],
+  ["৫৪. Bulk operations", "54. Bulk operations", "orderedBulkWrite — অনেক insert/update এক batch এ performance।"],
+  ["৫৫. Connection pooling Node", "55. Connection pooling with Node", "mongoose.connect once — pool reuse; বারবার connect expensive।"],
+  ["৫৬. Environment variables", "56. Env for MongoDB URI", "MONGODB_URI in .env — never commit secrets।"],
+  ["৫৭. Index intersection", "57. Index intersection", "MongoDB কখনো দুই index combine করে — compound index ভালো practice।"],
+  ["৫৮. Covered query", "58. Covered query", "Index এ সব field থাকলে document fetch skip — খুব fast।"],
+  ["৫৯. Memory limit aggregation", "59. Aggregation memory", "allowDiskUse: true — বড় pipeline disk use।"],
+  ["৬০. Interview must-know NoSQL", "60. NoSQL interview checklist", "CRUD, Index, Aggregation, Embed vs Ref, Replica, Sharding, Mongoose, CAP\n\n💡 MongoDB focus = Document + Scale"],
+];
+
+writeFileSync(
+  "src/data/nosql.ts",
+  `import type { QA } from "./types";
+
+/** MongoDB / NoSQL — SQL এর মতো সুন্দর ফরম্যাট */
+export const nosqlQAs: QA[] = [\n${items.map(([q, e, a]) => qa(q, e, a)).join("\n")}\n];\n`,
+);
+console.log("Wrote", items.length, "NoSQL questions");

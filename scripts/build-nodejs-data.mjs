@@ -1,0 +1,76 @@
+import { writeFileSync } from "fs";
+
+const qa = (q, qEn, a) =>
+  `  { q: ${JSON.stringify(q)}, qEn: ${JSON.stringify(qEn)}, a: ${JSON.stringify(a)} },`;
+
+const items = [
+  ["১. Node.js কী?", "1. What is Node.js?", "Node.js হলো JavaScript runtime যা browser এর বাইরে চালায় — V8 engine ব্যবহার করে।\n\nসহজে: একই ভাষায় server, file, database — সব করা যায়।\n\n💡 মুখস্থ: V8 + Server-side JS"],
+  ["২. Node vs Browser JS", "2. Node.js vs browser JS", "Browser: DOM, window, alert\nNode: fs, http, process — alert() কাজ করে না\n\n💡 Interview এ common"],
+  ["৩. NPM কী?", "3. What is NPM?", "Node Package Manager — package install/update।\n\n```bash\nnpm install express\n```"],
+  ["৪. V8 Engine", "4. V8 engine", "Google এর JS engine — JS কে machine code এ compile করে fast execute।"],
+  ["৫. Single-threaded + concurrency", "5. Single-threaded concurrency", "এক thread — কিন্তু event loop + non-blocking I/O দিয়ে হাজার request handle।\n\nউদাহরণ: ১ waiter, অনেক order — kitchen async।"],
+  ["৬. Event-driven architecture", "6. Event-driven architecture", "কাজ শেষ হলে event → callback চলে।\n\n💡 Event → Callback"],
+  ["৭. Event Loop", "7. Event loop", "Call stack খালি হলে callback queue থেকে কাজ নেয় — Node এর heart।"],
+  ["৮. Non-blocking I/O", "8. Non-blocking I/O", "অপেক্ষা না করে পরের কাজ — I/O শেষ হলে callback।"],
+  ["৯. Module types", "9. Module types", "Core (fs, http)\nLocal (নিজের file)\nThird-party (npm)\n\n💡 require / import"],
+  ["১০. require() vs import", "10. require vs import", "| CommonJS | ES Module |\n| require() | import |\n| module.exports | export |\n| sync | async |\n\nNode: \"type\":\"module\" for ESM"],
+  ["১১. package.json", "11. package.json", "Project metadata — name, scripts, dependencies।\n\n```json\n\"scripts\": { \"start\": \"node index.js\" }\n```"],
+  ["১২. fs module", "12. fs module", "File read/write/delete — async preferred (non-blocking)।"],
+  ["১৩. Callback", "13. Callback", "Function passed to run later।\n\n```javascript\nsetTimeout(() => console.log('hi'), 1000);\n```"],
+  ["১৪. Promise", "14. Promise", "Pending → Fulfilled / Rejected\n\n```javascript\nfetch(url).then(r => r.json()).catch(console.error);\n```"],
+  ["১৫. async/await", "15. async/await", "Promise এর সহজ syntax — await = অপেক্ষা, try/catch error।\n\n```javascript\nconst data = await fetch(url);\n```\n\n💡 Interview: same as Promise, cleaner code"],
+  ["১৬. Error-first callback", "16. Error-first callback", "(err, data) => {} — err null হলে success।"],
+  ["১৭. Express.js কী?", "17. What is Express?", "Minimal web framework — routing, middleware।\n\n```javascript\napp.get('/api', (req, res) => res.json({ ok: true }));\n```"],
+  ["১৮. Middleware", "18. Middleware", "req → middleware chain → res\n\nExample: auth, logger, body-parser"],
+  ["১৯. req vs res", "19. req vs res", "req — client data (body, params, query)\nres — response send (json, status)"],
+  ["২০. REST API", "20. REST API", "GET read, POST create, PUT/PATCH update, DELETE remove\n\nStatus: 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 500 Server Error"],
+  ["২১. JWT Authentication", "21. JWT authentication", "Token based auth — login এ token, header এ Bearer token।\n\n💡 Stateless API"],
+  ["২২. bcrypt password", "22. bcrypt passwords", "Plain password store never — hash + salt with bcrypt।"],
+  ["২৩. CORS", "23. CORS", "Browser cross-origin block — server এ Access-Control-Allow-Origin।"],
+  ["২৪. env variables", "24. Environment variables", "process.env.PORT — secrets .env file, git এ commit না।"],
+  ["২৫. dotenv", "25. dotenv", "require('dotenv').config() — .env load করে process.env এ।"],
+  ["২৬. Stream", "26. Streams", "Chunk এ data — বড় file memory এ না নিয়ে process।\n\nReadable, Writable, Transform"],
+  ["২৭. Buffer", "27. Buffer", "Binary data handle — file, network raw bytes।"],
+  ["২৮. Cluster module", "28. Cluster module", "Multiple worker process — CPU cores use।\n\n💡 PM2 similar idea"],
+  ["২৯. worker_threads", "29. worker_threads", "CPU heavy task আলাদা thread — event loop free রাখে।"],
+  ["৩০. EventEmitter", "30. EventEmitter", "Custom events — emitter.on('event', handler); emitter.emit('event');"],
+  ["৩১. process object", "31. process object", "process.env, process.argv, process.exit — Node global info।"],
+  ["৩২. child_process", "32. child_process", "Shell command / script run from Node।"],
+  ["৩৩. path module", "33. path module", "path.join, __dirname — cross-platform file paths।"],
+  ["৩৪. os module", "34. os module", "CPU, memory, platform info — monitoring।"],
+  ["৩৫. crypto module", "35. crypto module", "Hash, encrypt — security utilities।"],
+  ["৩৬. http vs https", "36. http vs https", "https — TLS encrypted — production mandatory।"],
+  ["৩৭. WebSocket", "37. WebSocket", "Real-time bidirectional — chat, live updates (socket.io)।"],
+  ["৩৮. Rate limiting", "38. Rate limiting", "express-rate-limit — DDoS/brute force reduce।"],
+  ["৩৯. Helmet.js", "39. Helmet.js", "Security HTTP headers — XSS, clickjacking help।"],
+  ["৪০. Validation", "40. Input validation", "joi / zod / express-validator — bad input reject early।"],
+  ["৪১. MongoDB + Node", "41. MongoDB with Node", "mongoose.connect(URI) — schema, models, queries।"],
+  ["৪২. SQL + Node (pg)", "42. SQL with Node", "pg pool — parameterized queries, SQL injection safe।"],
+  ["৪৩. Connection pooling", "43. Connection pooling", "Reuse DB connections — new connection expensive।\n\n💡 Same as SQL interview Q98-99"],
+  ["৪৪. ORM Prisma", "44. Prisma ORM", "Type-safe DB client — migration, schema.prisma।"],
+  ["৪৫. Sequelize", "45. Sequelize", "SQL ORM for Node — models, migrations।"],
+  ["৪৬. Redis cache", "46. Redis caching", "Fast memory cache — session, API response cache।"],
+  ["৪৭. Session vs JWT", "47. Session vs JWT", "Session — server store cookie\nJWT — stateless token\n\nScale: JWT easier horizontally"],
+  ["৪৮. MVC pattern", "48. MVC in Node", "Model (data) — View (UI) — Controller (logic)\n\nAPI: routes + controllers + services"],
+  ["৪৯. Layered architecture", "49. Layered architecture", "routes → controllers → services → repositories — clean separation।"],
+  ["৫০. Error handling middleware", "50. Error middleware", "```javascript\napp.use((err, req, res, next) => {\n  res.status(500).json({ message: err.message });\n});\n```"],
+  ["৫১. Async error in Express", "51. Async errors in Express", "wrap async route or try/catch — unhandled rejection crash এড়ান।"],
+  ["৫২. PM2", "52. PM2", "Process manager — restart on crash, cluster mode, logs।"],
+  ["৫৩. Nodemon", "53. Nodemon", "Dev auto-restart on file change।"],
+  ["৫৪. Jest testing", "54. Jest testing", "Unit/integration test — supertest for API endpoints।"],
+  ["৫৫. Memory leak debug", "55. Memory leak debugging", "heap snapshot, clinic.js, remove listeners, avoid global refs।"],
+  ["৫৬. Blocking event loop", "56. Blocking the event loop", "Sync heavy CPU — সব request stall; use worker_threads।"],
+  ["৫৭. Graceful shutdown", "57. Graceful shutdown", "SIGTERM → server.close() → DB disconnect → exit\n\nK8s deploy এ important"],
+  ["৫৮. File upload", "58. File upload", "multer middleware — disk/memory storage, size limit।"],
+  ["৫৯. Logging", "59. Logging", "winston / pino — structured logs, levels, production rotation।"],
+  ["৬০. Node.js interview checklist", "60. Node interview checklist", "Event Loop, Promise, Express, JWT, MongoDB/SQL, Security, Performance, PM2\n\n💡 5yr: production debugging + scaling"],
+];
+
+writeFileSync(
+  "src/data/nodejs.ts",
+  `import type { QA } from "./types";
+
+/** Node.js interview — SQL এর মতো সুন্দর ফরম্যাট */
+export const nodejsQAs: QA[] = [\n${items.map(([q, e, a]) => qa(q, e, a)).join("\n")}\n];\n`,
+);
+console.log("Wrote", items.length, "Node.js questions");

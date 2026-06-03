@@ -1,0 +1,30 @@
+import type { QA } from "./types";
+
+/** Advanced MongoDB — production & deep level (৬৬–৯০) */
+export const nosqlAdvancedQAs: QA[] = [
+  { q: "৬৬. [Advanced] writeConcern", qEn: "66. [Advanced] writeConcern", a: "Data write কতটা safely save হবে সেটা control করে।\n\n```javascript\n{ writeConcern: { w: \"majority\" } }\n```\n\nমানে majority replica তে save হওয়ার পরে success দিবে।\n\nInterview Follow-up — Why important?\nCritical data consistency — Payment system, Banking" },
+  { q: "৬৭. [Advanced] readConcern", qEn: "67. [Advanced] readConcern", a: "Read করার সময় কত consistent data লাগবে।\n\nTypes: local | majority | linearizable" },
+  { q: "৬৮. [Advanced] readPreference", qEn: "68. [Advanced] readPreference", a: "Data কোন replica থেকে read হবে।\n\nExample: primary, secondary, nearest\n\nUse case: Heavy read traffic distribute করা" },
+  { q: "৬৯. [Advanced] MongoDB transaction internally", qEn: "69. [Advanced] MongoDB transaction internally", a: "WiredTiger engine snapshot isolation use করে।\n\nTransaction চলাকালে consistent snapshot maintain হয়।\n\n💡 Senior tip: \"MongoDB transactions are heavier than relational DB joins — use carefully.\"" },
+  { q: "৭০. [Advanced] MongoDB transaction expensive কেন?", qEn: "70. [Advanced] MongoDB transaction expensive কেন?", a: "Multiple document lock\nSnapshot maintain\nReplica synchronization\n\n→ Performance impact" },
+  { q: "৭১. [Advanced] Document growth problem", qEn: "71. [Advanced] Document growth problem", a: "Document বড় হলে relocation হতে পারে।\n\nResult: Fragmentation, Performance issue" },
+  { q: "৭২. [Advanced] Working Set", qEn: "72. [Advanced] Working Set", a: "Frequently accessed data + indexes যা RAM এ থাকে।\n\nImportant: Working set RAM এ fit না করলে performance drop" },
+  { q: "৭৩. [Advanced] WiredTiger", qEn: "73. [Advanced] WiredTiger", a: "MongoDB default storage engine।\n\nFeatures: Compression, Document-level locking, Better concurrency" },
+  { q: "৭৪. [Advanced] MongoDB locking level", qEn: "74. [Advanced] MongoDB locking level", a: "Old: Collection lock\nNew: Document-level lock" },
+  { q: "৭৫. [Advanced] TTL Index", qEn: "75. [Advanced] TTL Index", a: "Automatic expiration।\n\n```javascript\ndb.tokens.createIndex(\n  { createdAt: 1 },\n  { expireAfterSeconds: 3600 }\n)\n```\n\n১ ঘণ্টা পরে auto delete" },
+  { q: "৭৬. [Advanced] Aggregation pipeline optimization", qEn: "76. [Advanced] Aggregation pipeline optimization", a: "Early $match\nReduce document size\nAvoid unnecessary $lookup\nProper index\nUse projection" },
+  { q: "৭৭. [Advanced] $facet", qEn: "77. [Advanced] $facet", a: "Single aggregation এ multiple pipeline run" },
+  { q: "৭৮. [Advanced] $unwind", qEn: "78. [Advanced] $unwind", a: "Array break করে multiple document বানায়" },
+  { q: "৭৯. [Advanced] $graphLookup", qEn: "79. [Advanced] $graphLookup", a: "Recursive relation query — tree/hierarchy data" },
+  { q: "৮০. [Advanced] Aggregation memory limit", qEn: "80. [Advanced] Aggregation memory limit", a: "Default ~100MB — need allowDiskUse: true for large pipelines" },
+  { q: "৮১. [Advanced] Sharding challenges", qEn: "81. [Advanced] Sharding challenges", a: "Uneven distribution\nHot shard\nComplex query\nResharding difficulty" },
+  { q: "৮২. [Advanced] Hot shard", qEn: "82. [Advanced] Hot shard", a: "সব traffic এক shard এ গেলে — bottleneck" },
+  { q: "৮৩. [Advanced] Good shard key characteristics", qEn: "83. [Advanced] Good shard key characteristics", a: "High cardinality\nEven distribution\nFrequently queried" },
+  { q: "৮৪. [Advanced] Chunk migration", qEn: "84. [Advanced] Chunk migration", a: "Shard এর মধ্যে data move — balancer" },
+  { q: "৮৫. [Advanced] Monotonically increasing shard key bad", qEn: "85. [Advanced] Monotonically increasing shard key bad", a: "সব write এক shard এ যায়।\n\nExample: auto increment id" },
+  { q: "৮৬. [Advanced] MongoDB slow suddenly — কী check?", qEn: "86. [Advanced] MongoDB slow suddenly — কী check?", a: "Index usage\nRAM usage\nDisk I/O\nReplication lag\nSlow query log\nLarge aggregation" },
+  { q: "৮৭. [Advanced] Replication lag", qEn: "87. [Advanced] Replication lag", a: "Secondary primary থেকে পিছিয়ে থাকা" },
+  { q: "৮৮. [Advanced] Oplog", qEn: "88. [Advanced] Oplog", a: "Operation log — replication এর জন্য" },
+  { q: "৮৯. [Advanced] MongoDB backup strategy", qEn: "89. [Advanced] MongoDB backup strategy", a: "mongodump\nSnapshot backup\nPoint-in-time recovery" },
+  { q: "৯০. [Advanced] Why avoid unbounded arrays?", qEn: "90. [Advanced] Why avoid unbounded arrays?", a: "Document huge হয়ে যায় — performance issue" },
+];
