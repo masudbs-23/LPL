@@ -14,10 +14,13 @@ import { Route as StatsRouteImport } from './routes/stats'
 import { Route as StandingsRouteImport } from './routes/standings'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as ResultsRouteImport } from './routes/results'
+import { Route as PlayersRouteImport } from './routes/players'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResultsIndexRouteImport } from './routes/results.index'
+import { Route as PlayersIndexRouteImport } from './routes/players.index'
 import { Route as ResultsMatchIdRouteImport } from './routes/results.$matchId'
+import { Route as PlayersPlayerIdRouteImport } from './routes/players.$playerId'
 
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
@@ -44,6 +47,11 @@ const ResultsRoute = ResultsRouteImport.update({
   path: '/results',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayersRoute = PlayersRouteImport.update({
+  id: '/players',
+  path: '/players',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
@@ -59,21 +67,34 @@ const ResultsIndexRoute = ResultsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ResultsRoute,
 } as any)
+const PlayersIndexRoute = PlayersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PlayersRoute,
+} as any)
 const ResultsMatchIdRoute = ResultsMatchIdRouteImport.update({
   id: '/$matchId',
   path: '/$matchId',
   getParentRoute: () => ResultsRoute,
 } as any)
+const PlayersPlayerIdRoute = PlayersPlayerIdRouteImport.update({
+  id: '/$playerId',
+  path: '/$playerId',
+  getParentRoute: () => PlayersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/players': typeof PlayersRouteWithChildren
   '/results': typeof ResultsRouteWithChildren
   '/schedule': typeof ScheduleRoute
   '/standings': typeof StandingsRoute
   '/stats': typeof StatsRoute
   '/videos': typeof VideosRoute
+  '/players/$playerId': typeof PlayersPlayerIdRoute
   '/results/$matchId': typeof ResultsMatchIdRoute
+  '/players/': typeof PlayersIndexRoute
   '/results/': typeof ResultsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -83,19 +104,24 @@ export interface FileRoutesByTo {
   '/standings': typeof StandingsRoute
   '/stats': typeof StatsRoute
   '/videos': typeof VideosRoute
+  '/players/$playerId': typeof PlayersPlayerIdRoute
   '/results/$matchId': typeof ResultsMatchIdRoute
+  '/players': typeof PlayersIndexRoute
   '/results': typeof ResultsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/players': typeof PlayersRouteWithChildren
   '/results': typeof ResultsRouteWithChildren
   '/schedule': typeof ScheduleRoute
   '/standings': typeof StandingsRoute
   '/stats': typeof StatsRoute
   '/videos': typeof VideosRoute
+  '/players/$playerId': typeof PlayersPlayerIdRoute
   '/results/$matchId': typeof ResultsMatchIdRoute
+  '/players/': typeof PlayersIndexRoute
   '/results/': typeof ResultsIndexRoute
 }
 export interface FileRouteTypes {
@@ -103,12 +129,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/join'
+    | '/players'
     | '/results'
     | '/schedule'
     | '/standings'
     | '/stats'
     | '/videos'
+    | '/players/$playerId'
     | '/results/$matchId'
+    | '/players/'
     | '/results/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -118,24 +147,30 @@ export interface FileRouteTypes {
     | '/standings'
     | '/stats'
     | '/videos'
+    | '/players/$playerId'
     | '/results/$matchId'
+    | '/players'
     | '/results'
   id:
     | '__root__'
     | '/'
     | '/join'
+    | '/players'
     | '/results'
     | '/schedule'
     | '/standings'
     | '/stats'
     | '/videos'
+    | '/players/$playerId'
     | '/results/$matchId'
+    | '/players/'
     | '/results/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JoinRoute: typeof JoinRoute
+  PlayersRoute: typeof PlayersRouteWithChildren
   ResultsRoute: typeof ResultsRouteWithChildren
   ScheduleRoute: typeof ScheduleRoute
   StandingsRoute: typeof StandingsRoute
@@ -180,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/players': {
+      id: '/players'
+      path: '/players'
+      fullPath: '/players'
+      preLoaderRoute: typeof PlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/join': {
       id: '/join'
       path: '/join'
@@ -201,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultsIndexRouteImport
       parentRoute: typeof ResultsRoute
     }
+    '/players/': {
+      id: '/players/'
+      path: '/'
+      fullPath: '/players/'
+      preLoaderRoute: typeof PlayersIndexRouteImport
+      parentRoute: typeof PlayersRoute
+    }
     '/results/$matchId': {
       id: '/results/$matchId'
       path: '/$matchId'
@@ -208,8 +257,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultsMatchIdRouteImport
       parentRoute: typeof ResultsRoute
     }
+    '/players/$playerId': {
+      id: '/players/$playerId'
+      path: '/$playerId'
+      fullPath: '/players/$playerId'
+      preLoaderRoute: typeof PlayersPlayerIdRouteImport
+      parentRoute: typeof PlayersRoute
+    }
   }
 }
+
+interface PlayersRouteChildren {
+  PlayersPlayerIdRoute: typeof PlayersPlayerIdRoute
+  PlayersIndexRoute: typeof PlayersIndexRoute
+}
+
+const PlayersRouteChildren: PlayersRouteChildren = {
+  PlayersPlayerIdRoute: PlayersPlayerIdRoute,
+  PlayersIndexRoute: PlayersIndexRoute,
+}
+
+const PlayersRouteWithChildren =
+  PlayersRoute._addFileChildren(PlayersRouteChildren)
 
 interface ResultsRouteChildren {
   ResultsMatchIdRoute: typeof ResultsMatchIdRoute
@@ -227,6 +296,7 @@ const ResultsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JoinRoute: JoinRoute,
+  PlayersRoute: PlayersRouteWithChildren,
   ResultsRoute: ResultsRouteWithChildren,
   ScheduleRoute: ScheduleRoute,
   StandingsRoute: StandingsRoute,

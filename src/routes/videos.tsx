@@ -54,9 +54,11 @@ function VideosPage() {
           ))}
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {filtered.map((v) => (
-            <VideoCard key={v.id} video={v} onClick={() => setActiveVideo(v)} />
+            <div key={v.id} className="h-[260px] w-full">
+              <VideoCard video={v} onClick={() => setActiveVideo(v)} />
+            </div>
           ))}
         </div>
       </section>

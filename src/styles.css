@@ -189,6 +189,14 @@
 }
 
 /* ── Hero background layers ── */
+.hero-photo {
+  animation: hero-photo-zoom 24s ease-in-out infinite alternate;
+  transform: scale(1.05);
+}
+@keyframes hero-photo-zoom {
+  0% { transform: scale(1.05); }
+  100% { transform: scale(1.12); }
+}
 .hero-sky {
   background:
     radial-gradient(ellipse 120% 80% at 50% -20%, oklch(0.45 0.12 85 / 0.35), transparent 55%),

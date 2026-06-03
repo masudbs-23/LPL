@@ -1,58 +1,76 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LplLayout } from "@/components/lpl/LplLayout";
 import { PageHero } from "@/components/lpl/PageHero";
-import {
-  CURRENT_SEASON,
-  battingStats,
-  bowlingStats,
-  getTeamName,
-} from "@/data/lpl";
+import { SeasonSelector } from "@/components/lpl/SeasonSelector";
+import { ScrollReveal } from "@/components/lpl/ScrollReveal";
+import { getTeamName } from "@/data/lpl";
+import { getSeason, getSeasonData } from "@/data/seasons";
+import { seasonSearchSchema } from "@/lib/seasonSearch";
 
 export const Route = createFileRoute("/stats")({
+  validateSearch: seasonSearchSchema,
   head: () => ({
     meta: [
       { title: "Player Stats — LPL Losmonpur Premier League" },
-      { name: "description", content: "Top batting and bowling statistics for LPL Season 7." },
+      { name: "description", content: "Top batting and bowling stats by season." },
     ],
   }),
   component: StatsPage,
 });
 
 function StatsPage() {
+  const { season: seasonId } = Route.useSearch();
+  const season = getSeason(seasonId);
+  const { battingStats, bowlingStats } = getSeasonData(seasonId);
+
   return (
     <LplLayout>
       <PageHero
         title="Player Statistics"
-        subtitle={`Season ${CURRENT_SEASON.number} — top performers with bat and ball`}
+        subtitle={
+          season
+            ? `Season ${season.number} (${season.year}) — top performers with bat and ball`
+            : "Season statistics"
+        }
       />
 
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <StatsTable
-            title="Top Run Scorers"
-            icon="🏏"
-            headers={["#", "Player", "Team", "Runs", "Details"]}
-            rows={battingStats.map((s) => [
-              s.rank,
-              s.name,
-              getTeamName(s.teamId),
-              s.value,
-              s.detail,
-            ])}
-          />
-          <StatsTable
-            title="Top Wicket Takers"
-            icon="🎯"
-            headers={["#", "Player", "Team", "Wkts", "Details"]}
-            rows={bowlingStats.map((s) => [
-              s.rank,
-              s.name,
-              getTeamName(s.teamId),
-              s.value,
-              s.detail,
-            ])}
-          />
-        </div>
+        <ScrollReveal>
+          <SeasonSelector seasonId={seasonId} className="mb-8" />
+        </ScrollReveal>
+
+        {battingStats.length === 0 && bowlingStats.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
+            Stats will appear once matches are played in this season.
+          </p>
+        ) : (
+          <div className="grid gap-8 lg:grid-cols-2">
+            <StatsTable
+              title="Top Run Scorers"
+              icon="🏏"
+              headers={["#", "Player", "Team", "Runs", "Details"]}
+              rows={battingStats.map((s) => [
+                s.rank,
+                s.name,
+                getTeamName(s.teamId),
+                s.value,
+                s.detail,
+              ])}
+            />
+            <StatsTable
+              title="Top Wicket Takers"
+              icon="🎯"
+              headers={["#", "Player", "Team", "Wkts", "Details"]}
+              rows={bowlingStats.map((s) => [
+                s.rank,
+                s.name,
+                getTeamName(s.teamId),
+                s.value,
+                s.detail,
+              ])}
+            />
+          </div>
+        )}
       </section>
     </LplLayout>
   );
@@ -69,6 +87,8 @@ function StatsTable({
   headers: string[];
   rows: (string | number)[][];
 }) {
+  if (rows.length === 0) return null;
+
   return (
     <div
       className="overflow-hidden rounded-xl border border-border bg-card"

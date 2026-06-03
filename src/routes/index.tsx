@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, ChevronDown, Play, Trophy, Users, Zap } from "lucide-react";
+import { ArrowRight, Calendar, ChevronDown, Play, Trophy, User, Users, Zap } from "lucide-react";
+import { PlayerCard } from "@/components/lpl/PlayerCard";
+import { players } from "@/data/players";
 import { LplLayout } from "@/components/lpl/LplLayout";
 import { CricketGroundHero } from "@/components/lpl/CricketGroundHero";
 import { HomeSection } from "@/components/lpl/HomeSection";
@@ -150,6 +152,36 @@ function HomePage() {
         </div>
       </HomeSection>
 
+      {/* Top Players */}
+      <HomeSection variant="elevated">
+        <SectionHeader
+          title="Top Players"
+          subtitle="Search squad — batting, bowling & all-rounders"
+          accent="Players"
+          linkTo="/players"
+          linkLabel="All Players"
+        />
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[...players]
+            .sort((a, b) => (b.batting?.runs ?? 0) - (a.batting?.runs ?? 0))
+            .slice(0, 3)
+            .map((p, i) => (
+              <ScrollReveal key={p.id} delay={i * 100} direction="up">
+                <PlayerCard player={p} />
+              </ScrollReveal>
+            ))}
+        </div>
+        <ScrollReveal delay={200} className="mt-6 text-center">
+          <Link
+            to="/players"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+          >
+            <User className="h-4 w-4" />
+            Search all {players.length} players
+          </Link>
+        </ScrollReveal>
+      </HomeSection>
+
       {/* Latest Results */}
       <HomeSection id="results">
         <SectionHeader
@@ -269,9 +301,9 @@ function HomePage() {
           linkTo="/videos"
           linkLabel="All Videos"
         />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {videos.slice(0, 3).map((v, i) => (
-            <ScrollReveal key={v.id} delay={i * 120} direction="up">
+            <ScrollReveal key={v.id} className="h-[260px] w-full" delay={i * 120} direction="up">
               <VideoCard video={v} onClick={() => setActiveVideo(v)} />
             </ScrollReveal>
           ))}

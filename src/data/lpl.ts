@@ -1,3 +1,5 @@
+import { findMatchResult } from "./seasons";
+
 export type Team = {
   id: string;
   name: string;
@@ -368,27 +370,27 @@ export const bowlingStats: PlayerStat[] = [
 export const videos: Video[] = [
   {
     id: "v1",
-    youtubeId: "NgC9W8s20mY",
-    title: "LPL Season 6 Grand Final Highlights",
-    description: "Ward 4 Tigers vs Ward 2 Strikers — full match highlights from the epic final.",
-    category: "final",
-    duration: "12:34",
+    youtubeId: "98PpjrZjddw",
+    title: "Chase master Kohli all class in final Aussie innings",
+    description: "Virat Kohli leads the chase with a composed, match-winning innings.",
+    category: "highlights",
+    duration: "Full",
   },
   {
     id: "v2",
-    youtubeId: "8A2t_TajN14",
-    title: "Best Sixes — LPL Season 6",
-    description: "Top 20 sixes from Season 6 — village cricket at its finest!",
-    category: "best-moments",
-    duration: "8:45",
+    youtubeId: "yFlarM35vxA",
+    title: "Kohli's FIRST Test Century in England! | Edgbaston 2018",
+    description: "Kohli's maiden Test hundred in England — Edgbaston 2018 classic.",
+    category: "highlights",
+    duration: "Full",
   },
   {
     id: "v3",
-    youtubeId: "3JXHfeC_Lfg",
-    title: "Rakib Hasan — Player of the Tournament",
-    description: "Interview with Season 6 Player of the Tournament Rakib Hasan.",
-    category: "interview",
-    duration: "5:20",
+    youtubeId: "Wp8_0FS-Ts4",
+    title: "Kohli's unbeaten 82* guides India past Australia | T20WC 2016",
+    description: "Kohli's unbeaten 82* knocks Australia out of the T20 World Cup 2016.",
+    category: "best-moments",
+    duration: "Full",
   },
   {
     id: "v4",
@@ -434,5 +436,5 @@ export function formatDate(dateStr: string): string {
 }
 
 export function getResultById(matchId: string): Match | undefined {
-  return results.find((m) => m.id === matchId);
+  return results.find((m) => m.id === matchId) ?? findMatchResult(matchId)?.match;
 }

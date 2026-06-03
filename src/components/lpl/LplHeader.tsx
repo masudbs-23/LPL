@@ -6,6 +6,7 @@ import { CURRENT_SEASON } from "@/data/lpl";
 
 const navLinks = [
   { to: "/", label: "Home" },
+  { to: "/players", label: "Players" },
   { to: "/schedule", label: "Schedule" },
   { to: "/results", label: "Results" },
   { to: "/standings", label: "Standings" },
